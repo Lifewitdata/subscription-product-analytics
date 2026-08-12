@@ -91,7 +91,7 @@ flowchart LR
 <td>🏗️ <b>0</b></td>
 <td>Synthetic data generation</td>
 <td>50,000 customers · 56K subscriptions · 2.3M product events · 720K transactions · 28K support tickets — all relationally consistent, seeded, reproducible</td>
-<td><code>generate_data.py</code><br/><code>generate_support_tickets.py</code></td>
+<td><code>scripts/generate_data.py</code><br/><code>scripts/generate_support_tickets.py</code></td>
 </tr>
 
 <tr>
@@ -167,29 +167,30 @@ flowchart LR
 
 ```text
 subscription-product-analytics/
-├── generate_data.py                          # core dataset generation (Phase 0)
-├── generate_support_tickets.py               # support ticket generation
-├── analyze_subscriptions.py                  # Phase 1
-├── phase2_engagement_retention_segmentation.py
-├── phase3_marketing_experiments.py
-├── phase4_support_funnel_sla.py
-├── phase5_issue_friction_analysis.py
-├── phase7_customer_experience_analysis.py
-├── phase8_issue_prioritization.py
-├── build_notebook.py                         # assembles everything below into ↓
-├── subscription_product_analytics_full_pipeline.ipynb   # ← run this for everything
+├── subscription_product_analytics_full_pipeline.ipynb   # ← the entire project, one notebook
+├── README.md
 │
-├── data/                                     # 8 CSVs, generated not hand-written
+├── data/                     # 8 CSVs — generated, not hand-written
 │   ├── customers.csv          ├── product_events.csv
 │   ├── subscriptions.csv      ├── transactions.csv
 │   ├── marketing_campaigns.csv├── customer_campaigns.csv
 │   ├── experiments.csv        └── support_tickets.csv
 │
-└── outputs/
-    ├── charts/            # 57 PNGs
-    ├── tables/             # 98 CSVs
-    └── *.md                # one findings/recommendations doc per phase
+├── outputs/
+│   ├── charts/                # 57 PNGs
+│   ├── tables/                # 98 CSVs
+│   └── *.md                   # one findings/recommendations doc per stage
+│
+└── scripts/                   # source .py files the notebook is assembled from
+    ├── build_notebook.py      #   (run this after editing a script to rebuild the notebook)
+    └── ...                    #   generation + analysis scripts, one per notebook section
 ```
+
+The notebook is the single entry point — every section (data generation, subscription
+performance, engagement/retention, marketing/experiments, support/SLA, issue friction,
+customer experience, prioritisation) runs top to bottom in one file. `scripts/` holds
+the underlying source in case you want to edit or run a section standalone; it isn't
+meant to be read as a separate deliverable.
 
 <br/>
 
@@ -198,11 +199,11 @@ subscription-product-analytics/
 ```bash
 pip install polars numpy matplotlib seaborn nbformat nbclient ipykernel
 
-# Everything, end to end (generation is skipped automatically if data/ already exists)
+# Run the whole project end to end (generation cells auto-skip if data/ already exists)
 jupyter nbconvert --to notebook --execute subscription_product_analytics_full_pipeline.ipynb
 
-# ...or run any single phase directly
-python phase8_issue_prioritization.py
+# Or just open it interactively
+jupyter lab subscription_product_analytics_full_pipeline.ipynb
 ```
 
 <br/>
